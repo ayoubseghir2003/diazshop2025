@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>diAz Shop</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.1.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.1.0/firebase-auth.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+
+ 
+  <style>
+.language-dropdown {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.dropbtn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 18px;
+  background: rgba(80, 67, 67, 0.85);
+  color: #fff;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(6px);
+}
+
+.dropbtn:hover {
+  background: rgba(106, 27, 154, 0.2);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+.language-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.dropdown-arrow {
+  font-size: 12px;
+  color: #e0c4ff;
+  transition: transform 0.3s ease;
+}
+
+.language-dropdown:hover .dropdown-arrow {
+  transform: rotate(180deg);
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-top: 10px;
+  min-width: 160px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  animation: fadeIn 0.25s ease-out;
+  border: 1px solid rgba(106, 27, 154, 0.15);
+}
+
+.language-dropdown:hover .dropdown-content {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.language-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 18px;
+  text-decoration: none;
+  color: #333;
+  font-size: 14px;
+  transition: background 0.2s ease, padding-left 0.2s ease;
+}
+
+.language-option:hover {
+  background: rgba(106, 27, 154, 0.08);
+  padding-left: 22px;
+}
+
+.flag-icon {
+  width: 22px;
+  height: auto;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.language-name {
+  font-weight: 600;
+}
+
+/* Optional: Mobile responsiveness */
+@media (max-width: 500px) {
+  .dropbtn {
+    padding: 8px 12px;
+    gap: 8px;
+    font-size: 13px;
+  }
+
+  .dropdown-content {
+    min-width: 140px;
+  }
+
+  .language-option {
+    padding: 10px 14px;
+  }
+}
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-image: url('images/img5.jpeg');
+      background-size: cover;
+      background-position: center;
+      overflow-x: hidden; /* Prevent horizontal scrolling */
+    }
+
+    .header {
+      display: flex;
+      flex-direction: column; /* Stack logo and title vertically */
+      align-items: center;
+      height: auto;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      background-image: url('images/img21.png') ;
+      padding: 20px; /* Add padding for better spacing */
+    }
+
+    .site-title {
+      font-size: 30px; /* Adjusted for mobile */
+      color: white;
+      font-family: Tahoma, sans-serif;
+      letter-spacing: 2px;
+      text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 40px auto;
+      background-color: rgba(255, 255, 255, 0.9);
+      padding: 20px; /* Reduced padding for mobile */
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Page d'introduction */
+    #introPage {
+      display: flex;
+      flex-direction: column; /* Stack elements vertically */
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-image: url('images/img10.png');
+      background-size: cover;
+      background-position: center;
+      color: #ffffff;
+      text-align: center;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    #introPage h1 {
+      font-size: 36px; /* Adjusted for mobile */
+      color: #ffffff;
+      font-weight: bold;
+      margin-bottom: 10px;
+      letter-spacing: 2px;
+      animation: fadeIn 1s ease-in-out;
+    }
+
+    #introPage p {
+      font-size: 18px; /* Adjusted for mobile */
+      color: #a1a1a1;
+      font-weight: bold;
+      line-height: 1.4;
+      margin-bottom: 20px;
+      animation: fadeIn 2s ease-in-out;
+    }
+
+    #introPage button {
+      padding: 10px 20px; /* Adjusted for mobile */
+      background-color: #fff;
+      color: #6a1b9a;
+      border: none;
+      border-radius: 50px;
+      font-size: 16px; /* Adjusted for mobile */
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.3s;
+      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+      outline: none;
+    }
+
+    #introPage button:hover {
+      background-color: #6a1b9a;
+      color: white;
+      transform: translateY(-4px);
+    }
+
+    #introPage button:active {
+      transform: translateY(2px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Animation de fondu pour l'entrée du texte */
+    @keyframes fadeIn {
+      0% {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Page d'accueil */
+    #welcomePage {
+      display: none; /* La page d'accueil est masquée au début */
+      text-align: center;
+      padding: 20px; /* Reduced padding for mobile */
+    }
+
+    #welcomePage img {
+      max-width: 100px; /* Adjusted for mobile */
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      font-size: 28px; /* Adjusted for mobile */
+      margin-bottom: 20px;
+      color: #6a1b9a;
+    }
+
+    .form-group {
+      margin: 10px 0; /* Reduced margin for mobile */
+      display: flex;
+      flex-direction: column; /* Stack label and input vertically */
+      align-items: center;
+    }
+
+    label {
+      font-weight: bold;
+      text-align: left;
+      width: 100%; /* Full width for label */
+    }
+
+    input[type="text"], input[type="tel"] {
+      width: 90%; /* Adjusted for mobile */
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      margin-top: 5px; /* Added margin for spacing */
+    }
+
+    button {
+      margin-top: 20px;
+      padding: 10px; /* Adjusted for mobile */
+      background-color: #6a1b9a;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      width: 90%; /* Full width for button */
+    }
+
+    button:hover {
+      background-color: #4a148c;
+    }
+    #map {
+  margin-top: 10px;
+  border: 1px solid #ccc;
+}
+
+    /* Page Menu */
+    #menuPage {
+      display: none;
+    }
+
+    #menuPage h2 {
+      text-align: center;
+      font-size: 24px; /* Adjusted for mobile */
+      color: #6a1b9a;
+    }
+
+    .menu-list {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px; /* Reduced gap for mobile */
+    }
+
+    .menu-item {
+      width: 150px; /* Adjusted for mobile */
+      background-color: white;
+      border-radius: 10px;
+      padding: 10px; /* Reduced padding for mobile */
+      text-align: center;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      transition: transform 0.2s;
+    }
+
+    .menu-item:hover {
+      transform: scale(1.05);
+    }
+
+    .menu-item img {
+      width: 100%;
+      height: 100px; /* Set a fixed height for uniformity */
+      object-fit: cover; /* Maintain aspect ratio */
+      border-radius: 10px;
+    }
+
+    .menu-item strong {
+      display: block;
+      margin: 5px 0; /* Reduced margin for mobile */
+      font-size: 16px; /* Adjusted for mobile */
+      color: #333;
+    }
+
+    .menu-item p {
+      font-size: 12px; /* Adjusted for mobile */
+      color: #666;
+    }
+
+    .menu-item button {
+      margin-top: 5px; /* Reduced margin for mobile */
+      background-color: #6a1b9a;
+      color: white;
+      border: none;
+      padding: 5px; /* Adjusted for mobile */
+      border-radius: 8px;
+      width: 100%; /* Full width for button */
+    }
+
+    /* Styles pour les onglets */
+    .menu-tabs {
+      display: flex;
+      justify-content: center;
+      gap: 5px; /* Reduced gap for mobile */
+      margin-bottom: 20px;
+      flex-wrap: wrap; /* Allow items to wrap on small screens */
+    }
+
+    .tab-button {
+      padding: 8px 15px; /* Adjusted for mobile */
+      background-color: #6a1b9a;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px; /* Adjusted for mobile */
+      transition: background-color 0.3s;
+    }
+
+    .tab-button:hover {
+      background-color: #4a148c;
+    }
+
+    .tab-button.active {
+      background-color: #4a148c;
+      font-weight: bold;
+    }
+
+    #cart {
+      margin-top: 20px; /* Adjusted for mobile */
+      padding: 20px;
+      background-color: #f9f9f9;
+      border-radius: 10px;
+    }
+
+    #cart h3 {
+      color: #6a1b9a;
+    }
+
+    #cart-items {
+      list-style: none;
+      padding: 0;
+    }
+
+    #total-price {
+      font-weight: bold;
+      color: #6a1b9a;
+    }
+
+    .support-band {
+      background: linear-gradient(45deg, #73247a, #90013c);
+      padding: 10px; /* Adjusted for mobile */
+      text-align: center;
+      font-size: 14px; /* Adjusted for mobile */
+      color: #fcfcfc;
+    }
+
+    .support-band a {
+      color: #fcf9f9;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .support-band a:hover {
+      text-decoration: underline;
+    }
+
+    footer {
+      text-align: center;
+      padding: 10px;
+      background-color: #eee;
+      font-size: 12px; /* Adjusted for mobile */
+      color: #666;
+    }
+
+    @media (max-width: 600px) {
+      /* Additional styles for small screens */
+      .header {
+        padding: 10px;
+      }
+
+      .site-title {
+        font-size: 24px; /* Further reduced for mobile */
+      }
+
+      #introPage h1 {
+        font-size: 28px; /* Further reduced for mobile */
+      }
+
+      #introPage p {
+        font-size: 16px; /* Further reduced for mobile */
+      }
+
+      button {
+        padding: 8px; /* Further reduced for mobile */
+      }
+
+      .form-group {
+        margin: 5px 0; /* Further reduced margin for mobile */
+      }
+
+      .menu-item {
+        width: 100%; /* Full width on mobile */
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1 class="site-title">diAz Shop</h1>
+    <div class="language-dropdown">
+  <button class="dropbtn">
+    <img src="images/internet.png" width="20" class="language-icon" alt="Language Icon">
+    <span class="language-text">Langue</span>
+    <i class="fas fa-chevron-down dropdown-arrow"></i>
+  </button>
+  <div class="dropdown-content">
+    <a href="index - AR.html" class="language-option">
+      <img src="images/flag.png" class="flag-icon" alt="Arabic Flag">
+      <span class="language-name">العربية</span>
+    </a>
+    <a href="index.html" class="language-option">
+      <img src="images/france-flag.png" class="flag-icon" alt="French Flag">
+      <span class="language-name">Français</span>
+    </a>
+  </div>
+</div>
+</div>
+</div>
+    <h1 class="site-title">diAz Shop</h1>
+  </div>
+  
+
+  <div class="container">
+    <!-- HTML pour la page d'introduction -->
+<div id="introPage">
+  <div>
+    <h1>diAz Shop</h1>
+    <p>Bienvenue sur diAz Shop, votre destination incontournable pour savourer des plats et des gâteaux traditionnels algériens. Nous sommes fiers de vous offrir une large variété de mets faits maison, préparés avec des ingrédients frais et authentiques. , nous avons quelque chose pour satisfaire toutes vos envies!</p>
+    <button onclick="goToWelcomePage()">Commencez votre commande</button>
+  </div>
+</div>
+
+    <!-- Page d'accueil -->
+    <div id="welcomePage">
+      <img src="images/logo of.png" alt="Logo diAzShop">
+      <h1>Bienvenue sur diAz Shop</h1>
+      <p>Veuillez entrer vos informations pour commencer :</p>
+
+      <div class="form-group">
+        <label for="name"><i class="fas fa-user"></i> Nom</label>
+        <input type="text" id="name" placeholder="Votre nom" required>
+      </div>
+      <div class="form-group">
+        <label for="phone"><i class="fas fa-phone"></i> Téléphone</label>
+        <input type="tel" id="phone" placeholder="Numéro de téléphone" required>
+      </div>
+      <div class="form-group">
+        <label for="address"><i class="fas fa-map-marker-alt"></i> Adresse</label>
+        <input type="text" id="address" placeholder="Cliquez sur la carte pour définir votre position" required>
+      </div>
+      
+      <div class="form-group">
+        <label>Sélectionnez votre emplacement sur la carte :</label>
+        <div id="map" style="height: 300px; width: 100%; border-radius: 10px;"></div>
+      </div>
+
+      <button onclick="goToMenu()">Envoyer</button>
+    </div>
+
+   <!-- Page du menu -->
+  <div id="menuPage">
+    <img src="images/logo of.png" alt="Logo diAzShop" width="200" height="150" style="display:block; margin: 0 auto;">
+    <h2 id="greeting">Bienvenue ! Voici notre menu</h2>
+
+    <!-- Barre de navigation pour les catégories -->
+    <div class="menu-tabs">
+    <button class="tab-button active" onclick="filterMenu('all')">Tous les plats</button>
+    <button class="tab-button" onclick="filterMenu('soupes')">Soupes</button>
+    <button class="tab-button" onclick="filterMenu('platsTraditionnels')">Plats traditionnels</button>
+    <button class="tab-button" onclick="filterMenu('secondsPlats')">Deuxieme repas</button>
+    <button class="tab-button" onclick="filterMenu('salades')">Salades</button>
+    <button class="tab-button" onclick="filterMenu('gâteaux')">Gâteaux algériens</button>
+
+    </div>
+
+    <!-- Conteneur pour afficher les plats -->
+    <div id="menu" class="menu-list"></div>
+
+    <!-- Panier -->
+    <div id="cart">
+    <h3>Votre commande</h3>
+    <ul id="cart-items"></ul>
+    <p>Total : <span id="total-price">0</span> DZA</p>
+    <p>Prix de livraison : <span id="delivery-price">0</span> DZA</p>
+    <p>Total avec livraison : <span id="total-with-delivery">0</span> DZA</p>
+    <p>Confirmez puis téléchargez en PDF pour le livreur.</p>
+    <button onclick="sendOrder()">Envoyer la commande</button>
+    <button onclick="generatePDF()">Télécharger en PDF</button>
+    <button onclick="clearCart()">Effacer</button>
+    </div>
+  </div>
+
+  </div>
+  <!-- Support Band -->
+  <div class="support-band">
+  <p>
+    📧 contactez le support sur : 
+    <a href="mailto:suppourtdiazshop25@outlook.com">suppourtdiazshop25@outlook.com</a> 
+    &nbsp;|&nbsp; 
+    📞 ou sur :
+    <a href="tel:+213670137886">067 013 78 86</a>
+  </p>
+  </div>
+
+  <!-- Optional: Footer -->
+  <footer>
+  <p>&copy; 2025 diAz Shop. All rights reserved.</p>
+  </footer>
+
+<script>
+   const storeLocation = {
+      lat: 36.7635990, // Latitude du magasin
+      lng: 3.2234100   // Longitude du magasin
+    };
+   const menuItems = {
+  soupes: [
+    { name: 'Soupe kabouya', price: 200, image: 'https://www.modesettravaux.fr/wp-content/uploads/modesettravaux/2022/11/graines-de-courge-614x410.jpg' },
+    { name: 'Soupe basbas', price: 200, image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQEXkhFsj8YtkraFXl74Sw5e3-vEkha9Bb6wR--VzZAagja5eaH68ozsvq2_L7nChtpyb4&usqp=CAU' },
+    { name: 'Soupe Batata', price: 200, image: 'https://www.cookomix.com/wp-content/uploads/2020/03/veloute-pomme-de-terre-thermomix-800x600.jpg' },
+    { name: 'Soupe des légumes', price: 200, image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSZjLe-CiYL2rd6WMeCIHjjKb4hDN06UkULJg&s' },
+    { name: 'Soupe des lentiles', price: 200, image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTOqS2qQprPSZuN2-D_-2aWih3spzS7QnAMMQ&s' }
+  ],
+  platsTraditionnels: [
+    { name: 'Plat Mtowam', price: 500, image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSD3_T0ji7-D5TojKMTLCHP1wdwrV6_Va8XMQ&s' },
+    { name: 'Chatitha lham', price: 500, image: 'https://us.123rf.com/450wm/fanfo/fanfo1409/fanfo140900042/31169003-chtitha-lham-lamb-in-een-rode-saus.jpg' },
+    { name: 'Couscous avec une cuisse de poulet', price: 800, image: 'images/img14.jpg' },
+    { name: 'Chakhchoukha avec cuisse de poulet', price: 800, image: 'images/img16.jpg' },
+    { name: 'Rachta avec une cuisse de poulet', price: 800, image: 'images/img19.jpg' },
+    { name: 'Loubia machto avec une cuisse de poulet', price: 800, image: 'https://img-3.journaldesfemmes.fr/1uBReI6IFSIug86JiYOJXdTnQYw=/750x500/dc3c61ef16f046809ec82203b94466b8/ccmcms-jdf/39712718.jpg' }
+  ],
+  secondsPlats: [
+    { name: 'Roulé de poulet haché farci', price: 500, image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTi_Zr4hIDnKp0Uji9o3ycSmrOcJTTfd23i9g&s' },
+    { name: 'Escalope marinée', price: 150, image: 'https://static.750g.com/images/640-420/2dd6200355ec4ca62815dcd4477fa5a5/bien-manger-se-faire-plaisir-et-garder-la-ligne-c-est-possible.jpg' },
+    { name: 'Escalope avec crème blanche', price: 250, image: 'https://cache.marieclaire.fr/data/photo/w1000_ci/6r/recette-escalopes-poulet-creme-a-la-four-facile.jpg' },
+    { name: 'Loubia', price: 200, image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSoHFpEwm-yCuAqqRj4VhIr32BXib311MochQ&s' },
+    { name: 'Boîte de frites', price: 150, image: 'https://storage.pizzapizza.ca/phx2/ppl_images/products/en/2x/Box-of-Fries.png?cache_key=176' },
+    { name: 'Pasta escalope sauce blanche', price: 600, image: 'images/img22.jpg' },
+
+  ],
+  salades: [
+    { name: 'Salade Verte', price: 150, image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQIKO7fwJ7UJchMF_pvF3w5JDtjBbzp3qf9mCJFQRjTCPSJ8kNMBaL-p7rdF-vhoXQFk0I&usqp=CAU' },
+    { name: 'Salade de riz', price: 200, image: 'https://img.cuisineaz.com/1024x576/2024/07/24/i199089-recette-de-salade-de-riz-froide.jpg' },
+    { name: 'Salade César', price: 250, image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQvi_I_MZLH4emQnnOIomYnzssY7l9BJOiUVA&s' },
+    { name: 'Boîte de riz "Basmati"', price: 200, image: 'https://img.cuisineaz.com/1200x675/2024/11/07/i202009-riz-basmati-cuit-a-ma-facon.jpg' }
+  ],
+  gâteaux: [
+    { name: 'les fruits', price: 200, image: 'images/imf.jpg' },
+    { name: 'Sablés au chocolat', price: 80, image: 'images/imsc.jpg' },
+    { name: 'Sablés à la pistache', price: 100, image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFBuAkEXMZPckjUtrjrSD4HTAYHHMyDeOf1g&s' },
+    { name: 'Dziriyat', price: 200, image: 'images/imd.jpg' },
+    { name: 'Tcharak El-Aryan', price: 140, image: 'images/imt3.jpg' },
+    { name: 'k3ik3at', price: 150, image: 'images/imk.jpg' },
+    { name: 'Sablés à la confiture', price: 45 , image: 'images/imsac.jpg' },
+    { name: 'Mouskoutchou', price: 750 , image: 'images/imm.jpg' },
+    { name: 'Tcharak El-Msker', price: 140 , image: 'images/imtm.jpg' },
+    { name: 'Bniwen', price: 100 , image: 'images/imb.jpg' },
+    { name: 'Sablés au citron', price: 120 , image: 'images/imslc.jpg' },
+    { name: 'Makrot', price: 120 , image: 'images/im9.jpg' },
+    { name: 'Bghrir', price: 25 , image: 'images/imbg.jpg' },
+    { name: 'khfaf', price: 40 , image: 'images/imkh.jpg' },
+  ]
+};
+// 🗺️ Initialize the Leaflet map
+let map = L.map('map').setView([36.7635990, 3.2234100], 13); // Default to store location
+let marker;
+
+// 🗺️ Add OpenStreetMap tile layer
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: 'Carte © OpenStreetMap',
+}).addTo(map);
+
+// 📍 When user clicks on the map
+map.on('click', function(e) {
+  const lat = parseFloat(e.latlng.lat.toFixed(6));
+  const lng = parseFloat(e.latlng.lng.toFixed(6));
+
+  // Add or move the marker
+  if (marker) {
+    marker.setLatLng(e.latlng);
+  } else {
+    marker = L.marker(e.latlng).addTo(map);
+  }
+
+  // Fill the address input with lat,lng
+  document.getElementById('address').value = `${lat},${lng}`;
+
+  // Now calculate delivery price
+  calculateDeliveryPrice(lat, lng);
+});
+
+   let cart = [];
+    let totalPrice = 0;
+    let deliveryPrice = 0;
+    function getLocation() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(showPosition, showError);
+      } else {
+        alert("La géolocalisation n'est pas supportée par ce navigateur.");
+      }
+    }
+
+    function showPosition(position) {
+      const latitude = position.coords.latitude;
+      const longitude = position.coords.longitude;
+      document.getElementById('address').value = `${latitude},${longitude}`;
+      // Calculer le prix de livraison après avoir obtenu la position
+  calculateDeliveryPrice(latitude, longitude);
+
+    }
+
+    function showError(error) {
+      switch(error.code) {
+        case error.PERMISSION_DENIED:
+          alert("L'utilisateur a refusé la demande de géolocalisation.");
+          break;
+        case error.POSITION_UNAVAILABLE:
+          alert("Les informations de localisation ne sont pas disponibles.");
+          break;
+        case error.TIMEOUT:
+          alert("La demande de localisation a expiré.");
+          break;
+        case error.UNKNOWN_ERROR:
+          alert("Une erreur inconnue s'est produite.");
+          break;
+      }
+    }
+    function goToWelcomePage() {
+      // Masquer la page d'introduction
+      document.getElementById('introPage').style.display = 'none';
+      
+      // Afficher la page d'accueil
+      document.getElementById('welcomePage').style.display = 'block';
+    }
+    // Fonction pour afficher le menu
+// Fonction pour afficher le menu
+function goToMenu() {
+  const name = document.getElementById('name').value;
+  const phone = document.getElementById('phone').value;
+  const address = document.getElementById('address').value;
+
+  if (!name || !phone || !address) {
+    alert("Veuillez remplir tous les champs.");
+    return;
+  }
+
+  document.getElementById('welcomePage').style.display = 'none';
+  document.getElementById('menuPage').style.display = 'block';
+  document.getElementById('greeting').textContent = `Bienvenue ${name} !`;
+
+  window.clientInfo = { name, phone, address };
+
+  const menuContainer = document.getElementById('menu');
+  menuContainer.innerHTML = ''; // Effacer le contenu précédent
+
+  // Ajouter tous les plats au conteneur
+  for (const category in menuItems) {
+    menuItems[category].forEach(item => {
+      const div = document.createElement('div');
+      div.className = `menu-item ${category}`;
+      div.innerHTML = `
+        <img src="${item.image}" alt="${item.name}">
+        <div class="details">
+          <strong>${item.name}</strong>
+          <p>Prix: DZA${item.price}</p>
+        </div>
+        <button onclick="addToCart('${item.name}', ${item.price})">Ajouter</button>
+      `;
+      menuContainer.appendChild(div);
+    });
+  }
+
+  // Activer le premier onglet par défaut
+  filterMenu('all');
+}
+
+// Fonction pour filtrer les plats par catégorie
+function filterMenu(category) {
+  // Retirer la classe 'active' de tous les boutons
+  document.querySelectorAll('.tab-button').forEach(button => button.classList.remove('active'));
+
+  // Ajouter la classe 'active' au bouton cliqué
+  const clickedButton = document.querySelector(`.tab-button[onclick="filterMenu('${category}')"]`);
+  if (clickedButton) clickedButton.classList.add('active');
+
+  // Afficher ou masquer les plats en fonction de la catégorie
+  document.querySelectorAll('.menu-item').forEach(item => {
+    if (category === 'all' || item.classList.contains(category)) {
+      item.style.display = 'block';
+    } else {
+      item.style.display = 'none';
+    }
+  });
+}
+
+    function addToCart(item, price) {
+      cart.push({ name: item, price: price });
+      totalPrice += price;
+      updateCartDisplay();
+    }
+
+    function updateCartDisplay() {
+      const cartItems = document.getElementById('cart-items');
+      cartItems.innerHTML = '';
+      cart.forEach(entry => {
+        const li = document.createElement('li');
+        li.textContent = `${entry.name} - DZA${entry.price}`;
+        cartItems.appendChild(li);
+        const totalWithDelivery = totalPrice + deliveryPrice;
+      document.getElementById('total-with-delivery').textContent = totalWithDelivery;
+      });
+
+      document.getElementById('total-price').textContent = totalPrice;
+      document.getElementById('delivery-price').textContent = deliveryPrice; // Mettre à jour le prix de livraison
+    }
+    function calculateDeliveryPrice(clientLat, clientLng) {
+      const distance = haversineDistance(storeLocation.lat, storeLocation.lng, clientLat, clientLng);
+      deliveryPrice = Math.round(distance * 30); // 8 DZA par km
+      updateCartDisplay(); // Mettre à jour l'affichage du panier
+    }
+
+    function haversineDistance(lat1, lon1, lat2, lon2) {
+      const R = 6371; // Rayon de la Terre en kilomètres
+      const dLat = toRad(lat2 - lat1);
+      const dLon = toRad(lon2 - lon1);
+      const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      return R * c; // Distance en kilomètres
+    }
+
+    function toRad(value) {
+      return (value * Math.PI) / 180; // Convertir les degrés en radians
+    }
+
+
+    function sendOrder() {
+      const { name, phone, address } = window.clientInfo;
+      const orderDetails = { name, phone, address, cart, totalPrice, deliveryPrice };
+
+      fetch('/api/submit-order', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(orderDetails)
+      })
+      .then(response => response.json())
+      .then(data => alert('Commande envoyée avec succès!'))
+      .catch(error => alert('Erreur lors de l\'envoi de la commande.'));
+    }
+    
+    function generatePDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      const name = document.getElementById("name").value;
+      const phone = document.getElementById("phone").value;
+      const address = document.getElementById("address").value;
+
+      doc.text("Résumé de commande - diAzShop", 10, 10);
+      doc.text(`Nom : ${name}`, 10, 20);
+      doc.text(`Téléphone : ${phone}`, 10, 30);
+      doc.text(`Adresse : ${address}`, 10, 40);
+      doc.text("Commande :", 10, 50);
+
+      const items = document.querySelectorAll("#cart-items li");
+      let y = 60;
+      items.forEach(item => {
+        doc.text(item.textContent, 10, y);
+        y += 10;
+      });
+
+      const total = document.getElementById("total-price").textContent;
+      const delivery = document.getElementById("delivery-price").textContent;
+      doc.text(`Total : DZA ${total}`, 10, y + 10);
+      doc.text(`Prix de livraison : DZA ${delivery}`, 10, y + 20);
+
+      doc.save("commande_diazshop.pdf");
+    }
+
+    function clearCart() {
+      cart = [];
+      totalPrice = 0;
+      const cartItems = document.getElementById('cart-items');
+      cartItems.innerHTML = '';
+      document.getElementById('total-price').textContent = totalPrice;
+    }
+    // 📍 Detect when address is manually typed (as address or lat,lng)
+document.getElementById('address').addEventListener('change', function () {
+  const value = this.value.trim();
+  const parts = value.split(',');
+
+  // 📌 Case: user entered coordinates
+  if (parts.length === 2 && !isNaN(parseFloat(parts[0])) && !isNaN(parseFloat(parts[1]))) {
+    const lat = parseFloat(parts[0]);
+    const lng = parseFloat(parts[1]);
+    updateMapAndDelivery(lat, lng);
+  } else {
+    // 🌍 Case: user entered real-world address — use Nominatim geocoding
+    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(value)}`;
+
+    fetch(url)
+      .then(response => response.json())
+      .then(data => {
+        if (data.length > 0) {
+          const lat = parseFloat(data[0].lat);
+          const lng = parseFloat(data[0].lon);
+
+          // Replace address input with coordinates
+          document.getElementById('address').value = `${lat.toFixed(6)},${lng.toFixed(6)}`;
+
+          updateMapAndDelivery(lat, lng);
+        } else {
+          alert("Adresse non trouvée. Veuillez être plus précis.");
+        }
+      })
+      .catch(error => {
+        console.error("Erreur de géocodage:", error);
+        alert("Impossible de localiser cette adresse.");
+      });
+  }
+});
+
+// ⬆️ Helper to move map + marker + calculate delivery
+function updateMapAndDelivery(lat, lng) {
+  const latlng = L.latLng(lat, lng);
+
+  if (marker) {
+    marker.setLatLng(latlng);
+  } else {
+    marker = L.marker(latlng).addTo(map);
+  }
+
+  map.setView(latlng, 13);
+  calculateDeliveryPrice(lat, lng);
+}
+
+  </script>
+</body>
+</html>
