@@ -4,6 +4,7 @@
 *.json
 .env
 .env.local
+data/
 node_modules/
 .DS_Store
 *.log
